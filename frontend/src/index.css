@@ -1,0 +1,109 @@
+/* 基础重置：主题与组件样式交给 Ant Design */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  /* 控制台的浅色底：比 antd 默认的 #f5f5f5 多一分冷调，跟登录页左栏同一族 */
+  background: #f4f7fc;
+}
+
+/* 流式 Markdown（tasklist 14.4）：答案由模型产出，表格/代码块/列表都可能出现，
+   这里只补 antd 没有覆盖的排版细节——行距、边距、表格边框。 */
+.kb-markdown {
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.kb-markdown > :first-child {
+  margin-top: 0;
+}
+
+.kb-markdown > :last-child {
+  margin-bottom: 0;
+}
+
+.kb-markdown p {
+  margin: 0 0 8px;
+}
+
+.kb-markdown ul,
+.kb-markdown ol {
+  margin: 0 0 8px;
+  padding-left: 20px;
+}
+
+.kb-markdown code {
+  background: #f5f5f5;
+  border-radius: 3px;
+  padding: 0 4px;
+  font-size: 12px;
+}
+
+.kb-markdown pre {
+  background: #f6f8fa;
+  border-radius: 6px;
+  margin: 0 0 8px;
+  overflow-x: auto;
+  padding: 12px;
+}
+
+.kb-markdown pre code {
+  background: none;
+  padding: 0;
+}
+
+.kb-markdown table {
+  border-collapse: collapse;
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+.kb-markdown th,
+.kb-markdown td {
+  border: 1px solid #e8e8e8;
+  padding: 6px 10px;
+  text-align: left;
+}
+
+.kb-markdown th {
+  background: #fafafa;
+}
+
+.kb-markdown blockquote {
+  border-left: 3px solid #d9d9d9;
+  color: #666;
+  margin: 0 0 8px;
+  padding: 4px 12px;
+}
+
+.kb-markdown img {
+  max-width: 100%;
+}
+
+/* 打字光标：只在流式追加正文时出现，让"还在写"这件事有视觉证据 */
+.kb-caret {
+  animation: kb-blink 1s steps(2, start) infinite;
+  background: #1f1f1f;
+  display: inline-block;
+  height: 14px;
+  margin-left: 2px;
+  vertical-align: -2px;
+  width: 6px;
+}
+
+@keyframes kb-blink {
+  to {
+    visibility: hidden;
+  }
+}
+
+

@@ -1,0 +1,130 @@
+# 只起依赖：PostgreSQL、Milvus standalone（etcd + minio）、Redis、业务对象存储
+# 前后端、Celery worker/beat 在 Windows 本地进程运行（见 TECH_SPEC §11）
+# 注：本文件的 minio 服务属于 Milvus，不发布端口；业务对象存储是下面的 objectstorage（kb_minio）
+services:
+  postgres:
+    image: postgres:16
+    container_name: kb_postgres
+    # 被强杀的测试/脚本进程会留下 idle in transaction 连接并一直持表锁，阻断后续 DDL；
+    # 5 分钟无活动就终止该会话（事务回滚）。改这里需要 `docker compose up -d postgres` 生效。
+    command:
+      - postgres
+      - -c
+      - idle_in_transaction_session_timeout=300000
+    environment:
+      POSTGRES_USER: kb
+      POSTGRES_PASSWORD: kb_dev_password
+      POSTGRES_DB: knowledge_base
+      TZ: UTC
+    ports:
+      # 宿主 5432 已被其他项目（cg-postgres）占用，本项目用 15432
+      - "15432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kb -d knowledge_base"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7
+    container_name: kb_redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      # 宿主 6379 已被其他项目（cg-redis）占用，本项目用 16379
+      - "16379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.5
+    container_name: kb_milvus_etcd
+    environment:
+      ETCD_AUTO_COMPACTION_MODE: revision
+      ETCD_AUTO_COMPACTION_RETENTION: "1000"
+      ETCD_QUOTA_BACKEND_BYTES: "4294967296"
+      ETCD_SNAPSHOT_COUNT: "50000"
+    command:
+      - etcd
+      - -advertise-client-urls=http://127.0.0.1:2379
+      - -listen-client-urls=http://0.0.0.0:2379
+      - --data-dir=/etcd
+    volumes:
+      - etcddata:/etcd
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  minio:
+    image: minio/minio:RELEASE.2023-03-20T20-16-18Z
+    container_name: kb_milvus_minio
+    environment:
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+    command: minio server /minio_data --console-address ":9001"
+    # 不对外发布端口：Milvus 通过 compose 网络内的 minio:9000 访问，且宿主 9000/9001 已被 cg-minio 占用
+    volumes:
+      - miniodata:/minio_data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  objectstorage:
+    image: minio/minio:RELEASE.2023-03-20T20-16-18Z
+    container_name: kb_minio
+    environment:
+      MINIO_ROOT_USER: kb_minio
+      MINIO_ROOT_PASSWORD: kb_minio_dev_password
+    command: minio server /data --console-address ":9001"
+    ports:
+      # 宿主 9000/9001 已被其他项目（cg-minio）占用，本项目用 19000/19001
+      - "19000:9000"
+      - "19001:9001"
+    volumes:
+      - objectdata:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  milvus:
+    image: milvusdb/milvus:v2.4.4
+    container_name: kb_milvus
+    command: ["milvus", "run", "standalone"]
+    security_opt:
+      - seccomp:unconfined
+    environment:
+      ETCD_ENDPOINTS: etcd:2379
+      MINIO_ADDRESS: minio:9000
+    ports:
+      - "19530:19530"
+    volumes:
+      - milvusdata:/var/lib/milvus
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+      interval: 30s
+      start_period: 90s
+      timeout: 20s
+      retries: 3
+    depends_on:
+      - etcd
+      - minio
+
+volumes:
+  pgdata:
+  redisdata:
+  etcddata:
+  miniodata:
+  milvusdata:
+  objectdata:

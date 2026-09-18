@@ -1,0 +1,291 @@
+/**
+ * AI 工作台：整块工作台是**一张面板**，内部用浅色线条分区——
+ * 左侧会话 ｜ 右侧对话，对话内部再由「对话区 / 输入区」的发丝线分隔。
+ *
+ * 之所以不再用「两张卡片 + 16px 间距」：间距是空的，线条才说得清边界。
+ * 配色跟外壳一致：中性灰分层，彩色只留助手回答那一块浅蓝底。
+ * 字号基准见 console.css 的 --kb-scale（当前是紧凑基准的 1.1 倍）。
+ */
+
+.kb-chat {
+  background: var(--kb-surface);
+  border: 1px solid var(--kb-line);
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  display: flex;
+  /* 顶栏 56 + 内容上下各 16 */
+  height: calc(100vh - 88px);
+  min-height: 520px;
+  overflow: hidden;
+}
+
+/* ---------- 左：会话 ---------- */
+
+.kb-chat__aside {
+  border-right: 1px solid var(--kb-line-soft);
+  display: flex;
+  flex: 0 0 var(--kb-aside-w);
+  flex-direction: column;
+  padding: 12px 10px;
+  width: var(--kb-aside-w);
+}
+
+.kb-chat .kb-chat__new.ant-btn {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(31, 31, 31, 0.12);
+  font-size: calc(14px * var(--kb-scale));
+}
+
+.kb-chat__sessions {
+  flex: 1;
+  margin-top: 16px;
+  overflow-y: auto;
+}
+
+.kb-chat__loading {
+  padding: 32px;
+  text-align: center;
+}
+
+.kb-chat .kb-chat__sessions .ant-empty {
+  margin-top: 24px;
+}
+
+.kb-chat .kb-chat__group-label.ant-typography {
+  color: #9ca3af;
+  display: block;
+  font-size: calc(12px * var(--kb-scale));
+  letter-spacing: 0.06em;
+  padding: 8px 10px 4px;
+}
+
+.kb-chat__session {
+  align-items: center;
+  border-radius: 10px;
+  display: flex;
+  gap: 4px;
+  margin-bottom: 3px;
+}
+
+.kb-chat__session:hover {
+  background: #f5f6f7;
+}
+
+/* 当前会话是一颗浅灰药丸，和侧栏选中项同一套语汇（那边是近黑，这里列表用浅灰） */
+.kb-chat__session--active {
+  background: #f0f0f2;
+}
+
+.kb-chat__open {
+  align-items: center;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  display: flex;
+  flex: 1;
+  font: inherit;
+  min-width: 0;
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.kb-chat .kb-chat__open .ant-typography {
+  color: #374151;
+  font-size: calc(13px * var(--kb-scale));
+}
+
+.kb-chat .kb-chat__session--active .kb-chat__open .ant-typography {
+  color: #1f1f1f;
+  font-weight: 600;
+}
+
+/* 删除键只在当前会话上现身：它同时也就只在当前会话上可聚焦，
+   键盘用户不会撞上一串点不动的按钮 */
+.kb-chat .kb-chat__remove.ant-btn {
+  visibility: hidden;
+}
+
+.kb-chat .kb-chat__session--active .kb-chat__remove.ant-btn {
+  visibility: visible;
+}
+
+/* ---------- 右：对话 ---------- */
+
+.kb-chat__main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.kb-chat__stream {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+/* 对话列与输入区都撑满剩余宽度：左侧历史会话栏定宽，剩下的全给对话（不再限宽 900） */
+.kb-chat__thread {
+  margin: 0;
+}
+
+/* 空态：不借 antd 那张灰色默认图，改用同色系的一块柔光图标 */
+.kb-chat__empty {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  padding-top: 96px;
+  text-align: center;
+}
+
+.kb-chat__empty-mark {
+  align-items: center;
+  background: linear-gradient(150deg, #dbeafe 0%, #ede9fe 52%, #d1fae5 100%);
+  border: 1px solid #c4d4f5;
+  border-radius: 18px;
+  color: #3b82f6;
+  display: flex;
+  font-size: 26px;
+  height: 64px;
+  justify-content: center;
+  margin-bottom: 14px;
+  width: 64px;
+}
+
+.kb-chat__empty-title {
+  color: #1f1f1f;
+  font-size: calc(14px * var(--kb-scale));
+  margin: 0;
+}
+
+/* ---------- 输入区：由一条发丝线与对话区分开 ---------- */
+
+.kb-chat__composer {
+  border-top: 1px solid var(--kb-line-soft);
+  padding: 12px 20px 16px;
+}
+
+.kb-chat__composer-inner {
+  margin: 0;
+}
+
+.kb-chat__hint {
+  color: #9ca3af;
+  display: block;
+  font-size: calc(12px * var(--kb-scale));
+  margin-bottom: 8px;
+}
+
+/* 一个圆角输入壳：输入框本身去边框，焦点环画在壳上 */
+.kb-chat__field {
+  align-items: flex-end;
+  background: #fafafa;
+  border: 1.5px solid #8ea2c8;
+  border-radius: 10px;
+  display: flex;
+  gap: 10px;
+  padding: 8px 10px 8px 14px;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.kb-chat__field:focus-within {
+  background: #fff;
+  border-color: #5b7fbf;
+  box-shadow: 0 0 0 3px rgba(91, 127, 191, 0.16);
+}
+
+.kb-chat .kb-chat__field .ant-input {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 6px 0;
+}
+
+.kb-chat .kb-chat__field .ant-input:focus,
+.kb-chat .kb-chat__field .ant-input:hover {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.kb-chat .kb-chat__field .ant-btn {
+  border-radius: 8px;
+  flex: none;
+}
+
+/* ---------- 气泡：助手那条要有一块颜色（要求 3） ---------- */
+
+.kb-bubble {
+  display: flex;
+  margin-bottom: 16px;
+}
+
+.kb-bubble--user {
+  justify-content: flex-end;
+}
+
+.kb-bubble--answer {
+  justify-content: flex-start;
+}
+
+.kb-bubble__column {
+  min-width: 0;
+}
+
+.kb-bubble--user .kb-bubble__column {
+  max-width: 72%;
+}
+
+.kb-bubble--answer .kb-bubble__column {
+  max-width: 88%;
+}
+
+.kb-bubble__body {
+  border-radius: 8px;
+  padding: 10px 14px;
+  word-break: break-word;
+}
+
+/* 用户提问：近黑实心，短、右贴（主色改黑白后，这里也跟着离开蓝色） */
+.kb-bubble--user .kb-bubble__body {
+  background: #1f1f1f;
+  color: #fff;
+  white-space: pre-wrap;
+}
+
+/* 助手回答：浅色渐变底——蓝 → 紫 → 青，斜着铺。都是粉彩色阶，深色正文压得住（对比度 ~14:1） */
+.kb-bubble--answer .kb-bubble__body {
+  background: linear-gradient(135deg, #e6f0ff 0%, #f1e9ff 52%, #e1f7ed 100%);
+  border: 1px solid #dfe6f7;
+}
+
+.kb-bubble__column > .ant-alert,
+.kb-bubble__column > .ant-btn {
+  margin-top: 8px;
+}
+
+/* 正文的 Markdown 按同一倍率放大，内边距跟着走 */
+.kb-chat .kb-markdown {
+  font-size: calc(14px * var(--kb-scale));
+  line-height: 1.75;
+}
+
+.kb-chat .kb-markdown p,
+.kb-chat .kb-markdown ul,
+.kb-chat .kb-markdown ol {
+  margin-bottom: 8px;
+}
+
+.kb-chat .kb-markdown ul,
+.kb-chat .kb-markdown ol {
+  padding-left: 22px;
+}
+
+.kb-chat .kb-markdown code {
+  font-size: calc(12px * var(--kb-scale));
+}
+
+.kb-chat .kb-markdown th,
+.kb-chat .kb-markdown td {
+  padding: 7px 12px;
+}

@@ -1,0 +1,27 @@
+# 后端核心依赖（uv 安装：uv pip install -r requirements.txt）
+# 重模型依赖见 requirements-ml.txt
+fastapi>=0.115
+uvicorn[standard]>=0.30
+pydantic>=2.7
+pydantic-settings>=2.3
+sqlalchemy>=2.0.30
+asyncpg>=0.29
+greenlet>=3.0
+alembic>=1.13
+redis>=5.0
+celery>=5.4
+pymilvus>=2.4.4
+minio>=7.2
+python-jose[cryptography]>=3.3
+passlib[bcrypt]>=1.7.4
+# passlib 1.7.4 与 bcrypt>=4.1 不兼容，必须锁 4.0.x
+bcrypt==4.0.1
+python-multipart>=0.0.9
+httpx>=0.27
+langgraph>=0.2
+langchain-core>=0.3
+langchain-openai>=0.2
+
+# 测试
+pytest>=8.2
+pytest-asyncio>=0.23

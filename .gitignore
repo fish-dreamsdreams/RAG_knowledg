@@ -1,0 +1,27 @@
+# 环境与密钥
+.env
+*.local
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# 前端
+node_modules/
+dist/
+.vite/
+
+# 运行时数据
+var/
+data/uploads/
+
+# 模型权重与本地卷
+models/
+volumes/
+
+# 编辑器
+.idea/
+.vscode/
