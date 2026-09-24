@@ -50,7 +50,7 @@ copy ..\.env.example .env
 .venv\Scripts\python.exe -m app.services.seed
 ```
 
-重模型依赖（BGE-M3、bge-reranker）体积大，按需单独安装。**本机显卡是 RTX 5070 Laptop（Blackwell / sm_120），必须用 CUDA 12.8 源**：
+重模型依赖（BGE-M3、bge-reranker）体积大，按需单独安装。pytorch版本必须大于 CUDA 12.8 源**：
 
 ```bat
 :: cu121 / cu124 轮子不含 sm_120 内核，装上会报 no kernel image is available
