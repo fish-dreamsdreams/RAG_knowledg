@@ -1,0 +1,51 @@
+[
+  {
+    "username": "admin",
+    "display_name": "系统管理员",
+    "password": "Demo@123456",
+    "department_key": "hq",
+    "roles": ["system_admin"]
+  },
+  {
+    "username": "kbadm",
+    "display_name": "知识管理员",
+    "password": "Demo@123456",
+    "department_key": "hq",
+    "roles": ["kb_admin"]
+  },
+  {
+    "username": "finance01",
+    "display_name": "财务专员",
+    "password": "Demo@123456",
+    "department_key": "finance",
+    "roles": ["employee"]
+  },
+  {
+    "username": "sales01",
+    "display_name": "销售专员",
+    "password": "Demo@123456",
+    "department_key": "sales",
+    "roles": ["employee"]
+  },
+  {
+    "username": "sales02",
+    "display_name": "华东销售",
+    "password": "Demo@123456",
+    "department_key": "sales_east",
+    "roles": ["employee"]
+  },
+  {
+    "username": "cs01",
+    "display_name": "客服专员",
+    "password": "Demo@123456",
+    "department_key": "cs",
+    "roles": ["employee"]
+  },
+  {
+    "username": "hr01",
+    "display_name": "人事专员",
+    "password": "Demo@123456",
+    "department_key": "hr",
+    "roles": ["employee"]
+  }
+]

@@ -1,0 +1,42 @@
+# 知识库管理平台 —— Celery worker（导入解析 / 切块入库 / FAQ 挖掘）
+#
+# **只能起一个实例**：任务投递与 FAQ 挖掘都不做跨实例去重，起两个会重复解析同一份文档。
+# （导入侧有 Redis 互斥锁兜底，但重复投递仍会白跑一遍。）
+#
+# 安装见 kb-api.service 头部；日志：journalctl -u kb-worker -f（里面有 MinerU 轮询与切块进度）
+
+[Unit]
+Description=知识库管理平台 Celery worker
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=kb
+Group=kb
+
+EnvironmentFile=/opt/kb-platform/backend/.env
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONPATH=/opt/kb-platform/backend
+WorkingDirectory=/opt/kb-platform/backend
+
+# --pool=threads 不是可选项：prefork 会让每个子进程各加载一份 BGE-M3，显存翻 N 倍
+# （celery_app.py 顶部写了原因，Embedder 内部已用锁串行化推理）。
+# 并发数请与 .env 的 INGEST_CONCURRENCY 保持一致——systemd 的 ExecStart 不做变量展开，
+# 改 .env 时记得同步这一行（或统一改成固定值）。
+ExecStart=/opt/kb-platform/backend/.venv/bin/python -m celery -A app.engines.celery.celery_app:celery_app worker --pool=threads --concurrency=4 --loglevel=info
+
+# 一个 PDF 的导入链最长约 15 分钟（MinerU 上限 900s）再加编码时间。
+# task_acks_late=true 下被强杀的任务只会留下一半状态、要人工重投，
+# 所以给足优雅退出时间让它把手上任务跑完。
+TimeoutStopSec=1800
+KillSignal=SIGTERM
+Restart=always
+RestartSec=5
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target

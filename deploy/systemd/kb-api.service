@@ -1,0 +1,55 @@
+# 知识库管理平台 —— API 进程（FastAPI / uvicorn）
+#
+# 部署形态见 TECH_SPEC §11：依赖（PostgreSQL / Milvus / Redis / MinIO）由仓库根的
+# docker-compose 起，应用本身跑宿主进程、不进容器。本文件与 kb-worker.service、
+# kb-beat.service 同属一套。
+#
+# 安装：
+#   sudo cp deploy/systemd/*.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now kb-api kb-worker kb-beat
+#
+# ── 落盘前必须改的（本文件里带 TODO 的行）─────────────────────────────
+#   1. User / Group：换成跑服务的账号（建议专用系统账号，且 backend/var 归它所有）
+#   2. /opt/kb-platform：换成代码实际所在目录（三份 unit 里都有）
+#
+# 日志走 journald：journalctl -u kb-api -f
+
+[Unit]
+Description=知识库管理平台 API（FastAPI / uvicorn）
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=kb
+Group=kb
+
+# .env 由应用自己读（pydantic-settings 读 backend/.env，相对工作目录），
+# 这里再喂一遍环境变量，是为了让 HF_HOME / HF_ENDPOINT 这类被 huggingface_hub
+# 直接读 os.environ 的变量也生效——它们不走 pydantic，只在 .env 里写没用。
+EnvironmentFile=/opt/kb-platform/backend/.env
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONPATH=/opt/kb-platform/backend
+
+# 必须是 backend/：.env、alembic.ini、var/ 都相对这里
+WorkingDirectory=/opt/kb-platform/backend
+
+# worker 数固定 1：每个 uvicorn worker 进程各加载一份 BGE-M3，多开会把显存翻倍
+ExecStart=/opt/kb-platform/backend/.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+
+# 启动预热会加载模型权重（EMBED_WARMUP_ENABLED=true），给到分钟级；
+# 关掉预热的话这里可以收紧到 30s
+TimeoutStartSec=300
+# 在途的问答请求与 WebSocket：留给优雅退出的时间
+TimeoutStopSec=60
+KillSignal=SIGINT
+Restart=always
+RestartSec=5
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target

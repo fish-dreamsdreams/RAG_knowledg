@@ -1,0 +1,8 @@
+[
+  { "key": "hq", "name": "总公司", "parent_key": null },
+  { "key": "finance", "name": "财务部", "parent_key": "hq" },
+  { "key": "sales", "name": "销售部", "parent_key": "hq" },
+  { "key": "sales_east", "name": "销售部-华东大区", "parent_key": "sales" },
+  { "key": "cs", "name": "客服部", "parent_key": "hq" },
+  { "key": "hr", "name": "人力资源部", "parent_key": "hq" }
+]

@@ -1,0 +1,27 @@
+[
+  { "code": "chat", "name": "AI 工作台", "type": "menu", "parent_code": null, "sort": 10 },
+  { "code": "knowledge", "name": "知识维护", "type": "menu", "parent_code": null, "sort": 20 },
+  { "code": "operations", "name": "沉淀运营", "type": "menu", "parent_code": null, "sort": 30 },
+  { "code": "dashboard", "name": "运营看板", "type": "menu", "parent_code": null, "sort": 40 },
+  { "code": "system", "name": "系统配置", "type": "menu", "parent_code": null, "sort": 50 },
+
+  { "code": "ai:chat", "name": "发起问答", "type": "button", "parent_code": "chat", "sort": 11 },
+
+  { "code": "kb:view", "name": "查看知识", "type": "button", "parent_code": "knowledge", "sort": 21 },
+  { "code": "kb:import", "name": "导入知识", "type": "button", "parent_code": "knowledge", "sort": 22 },
+  { "code": "kb:edit", "name": "编辑知识", "type": "button", "parent_code": "knowledge", "sort": 23 },
+  { "code": "kb:delete", "name": "删除知识", "type": "button", "parent_code": "knowledge", "sort": 24 },
+  { "code": "kb:acl", "name": "配置数据权限", "type": "button", "parent_code": "knowledge", "sort": 25 },
+
+  { "code": "faq:review", "name": "审核 FAQ 候选", "type": "button", "parent_code": "operations", "sort": 31 },
+  { "code": "faq:publish", "name": "发布 FAQ", "type": "button", "parent_code": "operations", "sort": 32 },
+  { "code": "gap:view", "name": "查看知识缺口", "type": "button", "parent_code": "operations", "sort": 33 },
+  { "code": "gap:convert", "name": "缺口转建导入", "type": "button", "parent_code": "operations", "sort": 34 },
+
+  { "code": "dash:view", "name": "查看看板", "type": "button", "parent_code": "dashboard", "sort": 41 },
+
+  { "code": "org:dept", "name": "部门管理", "type": "button", "parent_code": "system", "sort": 51 },
+  { "code": "org:user", "name": "用户管理", "type": "button", "parent_code": "system", "sort": 52 },
+  { "code": "org:role", "name": "角色管理", "type": "button", "parent_code": "system", "sort": 53 },
+  { "code": "sys:model", "name": "模型配置", "type": "button", "parent_code": "system", "sort": 54 }
+]

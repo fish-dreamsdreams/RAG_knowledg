@@ -1,0 +1,7 @@
+# 安装 requirements-ml.txt 时必须一起传的约束：
+#   uv pip install -r requirements-ml.txt --constraint requirements-ml.constraints.txt
+#
+# 原因：FlagEmbedding 依赖 torch。不加约束时 uv 会重新解析 torch 并从 PyPI 安装，
+# 而 Windows 上 PyPI 的 torch 是 CPU-only——GPU 会静默失效（模型跑在 CPU）。
+# 版本需与 `uv pip install torch --index-url .../cu128` 装出来的一致。
+torch==2.11.0+cu128

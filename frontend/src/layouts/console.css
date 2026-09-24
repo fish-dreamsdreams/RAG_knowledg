@@ -1,0 +1,336 @@
+/**
+ * 控制台外壳与页面共用的样式。
+ *
+ * 分工：能在 ConfigProvider 里表达的（颜色、圆角、控件高度、菜单选中态、表头底色…）都在
+ * `config/theme.js`；这里只留令牌表达不了的——发丝边框、极轻投影、字号密度、面包屑与侧栏
+ * 细节、状态胶囊的形状。选择器统一带 `.kb-console` 前缀，既不外溢到登录页，也压得住 antd
+ * 运行时注入的同名规则。
+ *
+ * 语言照参考站：白面 + 一层发丝线 + 中性灰分层，彩色只给状态胶囊（描边不填充）。
+ * 字号一律写 `calc(Npx * var(--kb-scale))`，`--kb-scale` 与 `config/theme.js` 的
+ * `FONT_SCALE` 是同一个值（antd 令牌只收数字、读不了 CSS 变量，两处必须一起改）。
+ */
+
+.kb-console {
+  /* 中性灰的一套：页面底色、面板底色、两种发丝线 */
+  --kb-page: #f7f8fa;
+  --kb-surface: #fff;
+  --kb-line: #e6e6ea;
+  --kb-line-soft: #f0f0f2;
+
+  /* 字号基准（= 1.1，紧凑型的 1.1 倍：正文约 15.4 / 表格约 14.3 / 辅助约 13.2） */
+  --kb-scale: 1.1;
+
+  /* AI 工作台左侧会话栏宽度 */
+  --kb-aside-w: 260px;
+
+  min-height: 100vh;
+}
+
+/* ---------- 壳 ---------- */
+
+.kb-console .ant-layout {
+  background: var(--kb-page);
+}
+
+.kb-console .ant-layout-sider {
+  border-right: 1px solid var(--kb-line);
+}
+
+.kb-console .ant-layout-sider-children {
+  display: flex;
+  flex-direction: column;
+}
+
+.kb-console .ant-menu.kb-console__menu {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-top: 8px;
+}
+
+.kb-console .ant-layout-header.kb-console__header {
+  align-items: center;
+  border-bottom: 1px solid var(--kb-line);
+  display: flex;
+  justify-content: space-between;
+  line-height: normal;
+}
+
+/* Logo 区与导航之间也拉一条发丝线：参考站就是靠这种线把区域分开的 */
+.kb-console__logo {
+  align-items: center;
+  border-bottom: 1px solid var(--kb-line);
+  display: flex;
+  gap: 10px;
+  height: 56px;
+  padding: 0 16px;
+}
+
+.kb-console__logo-text {
+  color: #1f1f1f;
+  font-size: calc(14px * var(--kb-scale));
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.kb-console .ant-layout-sider-collapsed .kb-console__logo {
+  justify-content: center;
+  padding: 0;
+}
+
+/* 折叠触发器收成一条细带：参考站底部只有一个很轻的折叠把手 */
+.kb-console .ant-layout-sider-trigger {
+  border-top: 1px solid var(--kb-line);
+}
+
+/* ---------- 顶栏：面包屑 + 账号 ---------- */
+
+.kb-console__crumb {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+}
+
+.kb-console .kb-console__crumb-site.ant-typography {
+  color: #6b7280;
+  font-size: calc(13px * var(--kb-scale));
+  white-space: nowrap;
+}
+
+.kb-console__crumb-sep {
+  color: #c9ccd4;
+  font-size: calc(13px * var(--kb-scale));
+}
+
+.kb-console .kb-console__page-title.ant-typography {
+  color: #1f1f1f;
+  font-size: calc(14px * var(--kb-scale));
+  margin: 0;
+}
+
+/* 账号区做成一颗可点的胶囊：比一堆裸文字更像「能点开」 */
+.kb-console .kb-console__account.ant-btn {
+  border-radius: 999px;
+  height: auto;
+  padding: 4px 14px 4px 6px;
+}
+
+.kb-console__account-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.35;
+  text-align: left;
+}
+
+.kb-console .kb-console__avatar.ant-avatar {
+  background: #f0f0f2;
+  color: #4b5563;
+  flex: none;
+}
+
+.kb-console .kb-console__name.ant-typography {
+  color: #1f1f1f;
+  font-size: calc(13px * var(--kb-scale));
+}
+
+.kb-console .kb-console__dept.ant-typography {
+  color: #9ca3af;
+  font-size: calc(11px * var(--kb-scale));
+}
+
+.kb-console .ant-layout-content.kb-console__content {
+  padding: 16px;
+}
+
+/* 所有按钮键统一灰色外框。主按钮默认边框跟填充同色，看不见，这里单独画出来。
+   文字/链接按钮本来就没有键面，不加框。弹窗挂在 portal，选择器不能只挂 .kb-console。 */
+.kb-console .ant-btn:not(.ant-btn-text):not(.ant-btn-link),
+.ant-modal .ant-btn:not(.ant-btn-text):not(.ant-btn-link),
+.ant-drawer .ant-btn:not(.ant-btn-text):not(.ant-btn-link),
+.ant-popconfirm .ant-btn:not(.ant-btn-text):not(.ant-btn-link) {
+  border: 1px solid #c4c7cf;
+}
+
+.kb-console .ant-btn:not(.ant-btn-text):not(.ant-btn-link):hover,
+.ant-modal .ant-btn:not(.ant-btn-text):not(.ant-btn-link):hover,
+.ant-drawer .ant-btn:not(.ant-btn-text):not(.ant-btn-link):hover,
+.ant-popconfirm .ant-btn:not(.ant-btn-text):not(.ant-btn-link):hover {
+  border-color: #a8adb8;
+}
+
+/* 输入框 / 下拉框描边与 AI 问答输入壳同一套：默认 #8ea2c8，聚焦 #5b7fbf。
+   弹窗与抽屉挂 portal，选择器不能只挂 .kb-console。 */
+.kb-console .ant-input,
+.kb-console .ant-input-affix-wrapper,
+.kb-console .ant-input-number,
+.kb-console .ant-input-number-affix-wrapper,
+.kb-console .ant-select .ant-select-selector,
+.kb-console .ant-picker,
+.kb-console .ant-mentions,
+.ant-modal .ant-input,
+.ant-modal .ant-input-affix-wrapper,
+.ant-modal .ant-input-number,
+.ant-modal .ant-input-number-affix-wrapper,
+.ant-modal .ant-select .ant-select-selector,
+.ant-modal .ant-picker,
+.ant-drawer .ant-input,
+.ant-drawer .ant-input-affix-wrapper,
+.ant-drawer .ant-input-number,
+.ant-drawer .ant-input-number-affix-wrapper,
+.ant-drawer .ant-select .ant-select-selector,
+.ant-drawer .ant-picker {
+  border-color: #8ea2c8;
+}
+
+.kb-console .ant-input:hover,
+.kb-console .ant-input-affix-wrapper:hover,
+.kb-console .ant-input-number:hover,
+.kb-console .ant-input-number-affix-wrapper:hover,
+.kb-console .ant-select:not(.ant-select-disabled):hover .ant-select-selector,
+.kb-console .ant-picker:hover,
+.kb-console .ant-mentions:hover,
+.ant-modal .ant-input:hover,
+.ant-modal .ant-input-affix-wrapper:hover,
+.ant-modal .ant-input-number:hover,
+.ant-modal .ant-input-number-affix-wrapper:hover,
+.ant-modal .ant-select:not(.ant-select-disabled):hover .ant-select-selector,
+.ant-modal .ant-picker:hover,
+.ant-drawer .ant-input:hover,
+.ant-drawer .ant-input-affix-wrapper:hover,
+.ant-drawer .ant-input-number:hover,
+.ant-drawer .ant-input-number-affix-wrapper:hover,
+.ant-drawer .ant-select:not(.ant-select-disabled):hover .ant-select-selector,
+.ant-drawer .ant-picker:hover {
+  border-color: #7a92bd;
+}
+
+.kb-console .ant-input:focus,
+.kb-console .ant-input-focused,
+.kb-console .ant-input-affix-wrapper-focused,
+.kb-console .ant-input-number-focused,
+.kb-console .ant-select-focused .ant-select-selector,
+.kb-console .ant-picker-focused,
+.kb-console .ant-mentions-focused,
+.ant-modal .ant-input:focus,
+.ant-modal .ant-input-focused,
+.ant-modal .ant-input-affix-wrapper-focused,
+.ant-modal .ant-input-number-focused,
+.ant-modal .ant-select-focused .ant-select-selector,
+.ant-modal .ant-picker-focused,
+.ant-drawer .ant-input:focus,
+.ant-drawer .ant-input-focused,
+.ant-drawer .ant-input-affix-wrapper-focused,
+.ant-drawer .ant-input-number-focused,
+.ant-drawer .ant-select-focused .ant-select-selector,
+.ant-drawer .ant-picker-focused {
+  border-color: #5b7fbf;
+  box-shadow: 0 0 0 3px rgba(91, 127, 191, 0.16);
+}
+
+/* ---------- 统一面板：各页面的 Card 都是同一个东西 ---------- */
+
+.kb-console .ant-card {
+  border-color: var(--kb-line);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.kb-console .ant-card-head {
+  border-bottom-color: var(--kb-line-soft);
+}
+
+.kb-console .ant-card-head-title {
+  color: #1f1f1f;
+  font-weight: 600;
+}
+
+/* ---------- 概览指标：一个指标一个浅色渐变底框 ---------- */
+
+/* 四档粉彩轮着上色：一行四个格子不重色，八个也不至于花。
+   渐变方向与 AI 工作台的回答框一致（135deg），两处看起来是一套东西。
+   底色比首版深一档（首版 #e8f2ff 那一族在 4K 屏上几乎跟白面分不开）——
+   随之把标题压到 slate-600：深底上原的 #8c8c8c 小字只有 2.6:1，读数没问题（14:1），标题得跟着走。 */
+.kb-console .kb-kpi-grid > .ant-col > .ant-statistic {
+  background: linear-gradient(135deg, #cfe4ff 0%, #e3d6ff 100%);
+  border: 1px solid var(--kb-line);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.kb-console .kb-kpi-grid .ant-statistic-title {
+  color: #475569;
+}
+
+.kb-console .kb-kpi-grid > .ant-col:nth-child(4n + 2) > .ant-statistic {
+  background: linear-gradient(135deg, #e3d6ff 0%, #ffd8eb 100%);
+}
+
+.kb-console .kb-kpi-grid > .ant-col:nth-child(4n + 3) > .ant-statistic {
+  background: linear-gradient(135deg, #c9ecdc 0%, #d6e6ff 100%);
+}
+
+.kb-console .kb-kpi-grid > .ant-col:nth-child(4n + 4) > .ant-statistic {
+  background: linear-gradient(135deg, #ffe1c4 0%, #ffd8e5 100%);
+}
+
+/* ---------- 状态胶囊：白底描边、全圆角 ---------- */
+
+/* antd 的彩色 Tag 是浅色填充，参考站是描边胶囊——只改底色，边框与文字仍跟着语义色走 */
+.kb-console .ant-tag {
+  background: var(--kb-surface);
+  border-radius: 999px;
+  font-size: calc(12px * var(--kb-scale));
+  line-height: 20px;
+  padding-inline: 10px;
+}
+
+/* ---------- 文字层级 ---------- */
+
+.kb-console .ant-typography.ant-typography-secondary {
+  color: #9ca3af;
+}
+
+.kb-console .ant-table {
+  font-size: calc(13px * var(--kb-scale));
+}
+
+.kb-console .ant-table-thead > tr > th {
+  font-size: calc(12.5px * var(--kb-scale));
+  font-weight: 600;
+}
+
+.kb-console .ant-table-tbody > tr > td {
+  color: #374151;
+}
+
+.kb-console .ant-descriptions .ant-descriptions-item-label,
+.kb-console .ant-form-item-label > label {
+  font-size: calc(12.5px * var(--kb-scale));
+}
+
+.kb-console .ant-descriptions .ant-descriptions-item-content {
+  color: #374151;
+  font-size: calc(13px * var(--kb-scale));
+}
+
+/* ---------- 浅底上的滚动条：默认那条深灰太重 ---------- */
+
+.kb-console ::-webkit-scrollbar {
+  height: 10px;
+  width: 10px;
+}
+
+.kb-console ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.kb-console ::-webkit-scrollbar-thumb {
+  background: #dcdfe5;
+  border-radius: 999px;
+}
+
+.kb-console ::-webkit-scrollbar-thumb:hover {
+  background: #c8ccd4;
+}

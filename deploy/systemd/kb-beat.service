@@ -1,0 +1,36 @@
+# 知识库管理平台 —— Celery beat（每日 03:00 触发 FAQ 挖掘）
+#
+# 计划表在 app/engines/celery/celery_app.py 的 beat_schedule（`faq.mine_candidates`）。
+# **只能起一个实例**，否则同一个时刻会触发两次（任务本身幂等，但没必要）。
+#
+# 安装见 kb-api.service 头部；日志：journalctl -u kb-beat -f
+
+[Unit]
+Description=知识库管理平台 Celery beat（定时触发）
+# 只负责投递，不干活；但 worker 不在时投出去也没人接，所以跟在 worker 之后
+After=network-online.target docker.service kb-worker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=kb
+Group=kb
+
+EnvironmentFile=/opt/kb-platform/backend/.env
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONPATH=/opt/kb-platform/backend
+WorkingDirectory=/opt/kb-platform/backend
+
+# -s 把调度状态（上次触发时间）落到 var/：默认写在工作目录根部，跟代码混在一起，
+# 既不好备份也不好排查。首次运行前确认 backend/var 存在且属于 kb 账号。
+ExecStart=/opt/kb-platform/backend/.venv/bin/python -m celery -A app.engines.celery.celery_app:celery_app beat -s /opt/kb-platform/backend/var/celerybeat-schedule --loglevel=info
+
+Restart=always
+RestartSec=10
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target

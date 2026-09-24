@@ -1,0 +1,24 @@
+# 本地模型依赖（体积大，单独安装）
+#
+# 1) 先装 torch。本机显卡为 RTX 5070 Laptop（Blackwell / sm_120），必须用 CUDA 12.8 源：
+#      uv pip install torch --index-url https://download.pytorch.org/whl/cu128
+#    注意：cu121 / cu124 的轮子不含 sm_120 内核，装上会报
+#    "no kernel image is available for execution on the device"。
+#    torch 故意不列在本文件里：若由 pip 从默认源解析，可能拿到 CUDA 版本不一致的包；
+#    先按上面的命令装好 torch，本文件的依赖会被视为已满足。
+#    实测装好的是 torch==2.11.0+cu128（python 3.12）。
+#
+# 2) 再装其余依赖（**必须带约束**）：
+#      uv pip install -r requirements-ml.txt --constraint requirements-ml.constraints.txt
+#    FlagEmbedding 依赖 torch，不加约束时 uv 会把它换成 PyPI 的轮子，而
+#    Windows 上 PyPI 的 torch 是 CPU-only（没有 CUDA），模型会静默跑在 CPU 上。
+#
+# 3) 校验 GPU 可用（应输出 True 与设备名）：
+#      .venv\Scripts\python.exe -c "import torch; print(torch.cuda.is_available(), torch.cuda.get_device_name(0))"
+#
+# 4) 首次运行会自动从 Hub 拉权重（BGE-M3 约 2.2GB）。若本机设了镜像
+#    （HF_ENDPOINT=hf-mirror.com），app/common/model_cache.py 会自动禁用 Xet 传输
+#    并跳过镜像 403 的垃圾文件，无需手工干预。
+FlagEmbedding>=1.2.11
+sentence-transformers>=3.0
+numpy>=1.26

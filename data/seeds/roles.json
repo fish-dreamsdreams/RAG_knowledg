@@ -1,0 +1,36 @@
+[
+  {
+    "code": "system_admin",
+    "name": "系统管理员",
+    "description": "全部功能权限与组织管理",
+    "permissions": ["*"]
+  },
+  {
+    "code": "kb_admin",
+    "name": "知识管理员",
+    "description": "知识维护、FAQ 沉淀、缺口与看板",
+    "permissions": [
+      "chat",
+      "knowledge",
+      "operations",
+      "dashboard",
+      "ai:chat",
+      "kb:view",
+      "kb:import",
+      "kb:edit",
+      "kb:delete",
+      "kb:acl",
+      "faq:review",
+      "faq:publish",
+      "gap:view",
+      "gap:convert",
+      "dash:view"
+    ]
+  },
+  {
+    "code": "employee",
+    "name": "普通员工",
+    "description": "仅可发起问答",
+    "permissions": ["chat", "ai:chat"]
+  }
+]
